@@ -1,0 +1,76 @@
+org 100h
+
+; Let's insert the 8-bit unsigned 10 numbers
+MOV [BX], 0200H
+MOV BYTE PTR [BX+1], 70H
+MOV BYTE PTR [BX+2], 70H
+MOV BYTE PTR [BX+3], 69H
+MOV BYTE PTR [BX+4], 79H
+MOV BYTE PTR [BX+5], 68H
+MOV BYTE PTR [BX+6], "$"
+;MOV BYTE PTR [BX+6], 75H   TEST    
+;MOV BYTE PTR [BX+7], 01H   TEST
+;MOV BYTE PTR [BX+8], 5FH   TEST
+;MOV BYTE PTR [BX+9], 23H   TEST
+  
+MOV SI, 0             ; The register to be used in the inner loop iteration
+MOV DI, 0             ; The register to be used in the outer loop iteration
+
+innerloop:
+  MOV DL, [BX+SI]       ; Register to hold the smallest number
+  MOV AL, [BX+SI+1]     ; Gets the corresponding byte at base address 0700:0200 (indexed with SI+1)
+
+  CMP AL, DL            ; If the value of the AL register is greater than or equal to DL,
+  JAE @IF               ; If AL >= DL (CF=0), go to the IF block
+  JB @ELSE              ; If AL < DL (CF=1), go to the ELSE block
+
+@IF:                    ; IF block
+  MOV [BX+SI], DL       ; If AL is greater than DL, there is no need to swap 
+  MOV [BX+SI+1], AL     ; because they are already sorted among themselves.
+  INC SI                ; For iteration, increase the register by 1 (SI=SI+1)
+
+  CMP SI, 9             ; Is SI equal to 9?
+  JNZ innerloop         ; (ZF=0) enter the inner loop
+
+  ; Print the sorted array
+  MOV CX, 10
+  LEA DI, [BX]
+
+printLoop:
+  MOV AH, 02h           ; DOS function to display character
+  MOV DL, [DI]          ; Load the character from the array
+  INT 21h               ; Call DOS to display the character
+
+  INC DI                ; Move to the next element in the array
+  LOOP printLoop        ; Continue loop until all elements are displayed
+
+  ; Exit program
+  MOV AH, 4CH
+  INT 21h
+
+@ELSE:                  ; ELSE block
+  MOV [BX+SI], AL       ; Values are swapped in the same regions in memory
+  MOV [BX+SI+1], DL
+  MOV CL, AL            ; Swap for registers
+  MOV AL, DL
+  MOV DL, CL
+  INC SI                ; Increment register by 1 for iteration (SI=SI+1)
+
+  CMP SI, 9             ; Is SI equal to 9?
+  JNZ innerloop         ; (ZF=0) enter the inner loop
+
+  ; Print the sorted array
+  MOV CX, 10
+  LEA DI, [BX]
+
+printLoopElse:
+  MOV AH, 02h           ; DOS function to display character
+  MOV DL, [DI]          ; Load the character from the array
+  INT 21h               ; Call DOS to display the character
+
+  INC DI                ; Move to the next element in the array
+  LOOP printLoopElse    ; Continue loop until all elements are displayed
+
+  ; Exit program
+  MOV AH, 4CH
+  INT 21h

@@ -1,3 +1,20 @@
 Lab01- bubble sort algorithm with some hexadecimal values.
+---------------------------------------------------------------
+Lab02 - factorial numbering
+---------------------------------------------------------------
+Lab03 - Decrypt string using:
+
+h(g(f(x))) which:
+
+f(x)=2x+4EH
+
+g(x)=x/2+47H
+
+h(x)=x mod 7BH
+
+You should use at least 3 string instructions, less than 3 string instruction will result in less points for labwork
+
+Hint: the value of biggest character is 87H, smallest character is 17H
+---------------------------------------------------------------
 
 

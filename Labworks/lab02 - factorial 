@@ -1,0 +1,73 @@
+MOV CX,12;returns 90H on DX register
+CALL fib
+MOV DX,AX
+MOV AH,4CH
+INT 21H
+fib PROC NEAR:
+    CMP CX,0
+    JNE one:
+    MOV AX,0
+    RET
+    one:
+    CMP CX,1
+    JNE add_fib
+    MOV AX,1
+    RET
+    add_fib:
+    DEC CX
+    PUSH CX
+    CALL fib
+    POP CX
+    DEC CX
+    PUSH AX
+    CALL fib
+    POP BX
+    ADD AX,BX
+    RET    
+fib ENDP
+
+######## fibonacci with memoization ############
+
+MOV AX,2000H
+MOV DS,AX
+MOV [DI],0
+MOV [DI+2],1
+MOV CX,20;returns 1A6DH on DX register
+CALL fib
+MOV DX,AX
+MOV AH,4CH
+INT 21H
+fib PROC NEAR:
+    CMP CX,0
+    JNE one:
+    MOV AX,0
+    RET
+    one:
+    CMP CX,1
+    JNE memo
+    MOV AX,1
+    RET
+    memo:
+    MOV BX,CX
+    SHL BX,1
+    CMP [DI+BX],0
+    JE add_fib
+    MOV AX,[DI+BX]
+    RET
+    add_fib:
+    PUSH CX
+    DEC CX
+    PUSH CX
+    CALL fib
+    POP CX
+    DEC CX
+    PUSH AX
+    CALL fib
+    POP DX
+    ADD AX,DX
+    POP CX
+    MOV BX,CX
+    SHL BX,1
+    MOV [DI+BX],AX
+    RET    
+fib ENDP
